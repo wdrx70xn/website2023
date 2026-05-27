@@ -1,25 +1,24 @@
 name: AddBinderBadge
-# https://github.com/jupyterhub/repo2docker-action#cache-builds-on-mybinderorg-and-provide-a-link
-on:
+'on':
   pull_request:
-    types: [opened, reopened]
+    types:
+    - opened
+    - reopened
     paths:
-      - 'book/tutorials/**'
-      - '.github/workflows/binder-badge.yml'
-      - 'conda/**'
+    - book/tutorials/**
+    - .github/workflows/binder-badge.yml
+    - conda/**
 jobs:
   add-badge:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout PR
       uses: actions/checkout@v2
-
     - name: cache binder build on mybinder.org
       uses: jupyterhub/repo2docker-action@master
       with:
         NO_PUSH: true
         MYBINDERORG_TAG: ${{ github.event.pull_request.head.ref }}
-
     - name: Comment on PR with Binder link
       uses: actions/github-script@v3
       env:
@@ -27,12 +26,7 @@ jobs:
         CONTENT_REPO: ${{github.event.pull_request.head.repo.full_name}}
       with:
         github-token: ${{secrets.GITHUB_TOKEN}}
-        script: |
-          var BRANCH_NAME = process.env.BRANCH_NAME;
-          var CONTENT_REPO = process.env.CONTENT_REPO;
-          github.issues.createComment({
-            issue_number: context.issue.number,
-            owner: context.repo.owner,
-            repo: context.repo.repo,
-            body: `[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/${context.repo.owner}/${context.repo.repo}/${BRANCH_NAME}) :point_left: Launch a binder notebook on this branch`
-          })
+        script: "var BRANCH_NAME = process.env.BRANCH_NAME;\nvar CONTENT_REPO = process.env.CONTENT_REPO;\n\
+          github.issues.createComment({\n  issue_number: context.issue.number,\n \
+          \ owner: context.repo.owner,\n  repo: context.repo.repo,\n  body: `[![Binder](https://mybinder.org/badge_logo.svg)](https://mybinder.org/v2/gh/${context.repo.owner}/${context.repo.repo}/${BRANCH_NAME})\
+          \ :point_left: Launch a binder notebook on this branch`\n})\n"
