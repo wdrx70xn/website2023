@@ -1,25 +1,23 @@
 name: Build Without Cache
-
-on:
-  workflow_dispatch:
-
+'on':
+  workflow_dispatch: null
 jobs:
   build-and-test:
-    runs-on: ubuntu-20.04
-
+    runs-on: ubuntu-latest
     steps:
     - name: Checkout repository
       uses: actions/checkout@v2
-      
     - name: Configure NASA Earthdata Login
       continue-on-error: true
       env:
         EARTHDATA_USER: ${{ secrets.EARTHDATA_USER}}
         EARTHDATA_PASS: ${{ secrets.EARTHDATA_PASS }}
-      run: |
-        echo "machine urs.earthdata.nasa.gov login $EARTHDATA_USER password $EARTHDATA_PASS" > ~/.netrc
+      run: 'echo "machine urs.earthdata.nasa.gov login $EARTHDATA_USER password $EARTHDATA_PASS"
+        > ~/.netrc
+
         chmod 0600 ~/.netrc
-        
+
+        '
     - uses: ./.github/actions/buildresources
       with:
         jb-cache: false
